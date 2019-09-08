@@ -1,3 +1,8 @@
+/**
+ * @fileOverview 定时器类（用于定时执行程序）
+ * @author <a href="http://qww.elins.cn">邱文武</a>
+ * @version 1.0
+*/
 require('mm_expand');
 /// 延迟
 /// milliSeconds: 毫秒 (number)
