@@ -11,17 +11,10 @@
     "url": "git+https://github.com/qiuwenwu/mm_timer.git"
   },
   "keywords": [
-    "mytimer",
-    "async",
-    "await",
-    "promise",
-    "add",
-    "del",
-    "set",
-    "get",
-    "query",
+    "timer",
     "run",
-    "exec"
+	"task",
+	"async"
   ],
   "author": "邱文武",
   "license": "ISC",
