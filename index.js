@@ -1,7 +1,7 @@
 /**
  * @fileOverview 定时器类（用于定时执行程序）
  * @author <a href="http://qww.elins.cn">邱文武</a>
- * @version 1.0
+ * @version 1.2
 */
 require('mm_expand');
 /// 延迟
