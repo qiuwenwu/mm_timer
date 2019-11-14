@@ -1143,15 +1143,13 @@ if (typeof($) === "undefined") {
 			} else {
 				file = f.replace('./', runPath);
 			}
-		} 
-		else if (f.startWith('../')) {
+		} else if (f.startWith('../')) {
 			if (dir) {
 				file = dir.fullname() + f;
 			} else {
 				file = runPath + f;
 			}
-		}
-		else if (f.startWith('/') && !f.startWith(runPath)) {
+		} else if (f.startWith('/') && !f.startWith(runPath)) {
 			file = runPath + f.substring(0);
 		}
 		file = join(file, '');
@@ -2171,4 +2169,190 @@ if (typeof($) === "undefined") {
 		};
 	};
 	$.timer = new Timer();
+})();
+
+
+(function() {
+	/**
+	 * @description 添加对象属性
+	 * @param {Object} obj 对象
+	 * @param {Object} query 查询条件
+	 * @param {Object} value 添加值
+	 * @return {Object} 返回添加的局部对象
+	 */
+	function add(obj, query, value) {
+		if (query) {
+			var oj = get(obj, query);
+			if (oj) {
+				$.push(oj, value, true);
+			}
+			return oj;
+		} else {
+			$.push(obj, value, true);
+			return obj;
+		}
+	};
+	$.add = add;
+
+	/**
+	 * @description 删除对象属性
+	 * @param {Object} obj 对象
+	 * @param {Object} query 查询条件
+	 * @param {Object} item 查询条件
+	 * @return {Object} 返回删除结果
+	 */
+	function del(obj, query, item) {
+		var o = {};
+		if (query) {
+			o = get(obj, query);
+		} else {
+			o = obj;
+		}
+		if (!item) {
+			item = Object.assign(o);
+		}
+		if (Array.isArray(o)) {
+			o.clear();
+		} else if (Array.isArray(item)) {
+			for (var i = 0; i < item.length; i++) {
+				var val = item[i];
+				if (typeof(val) === "object") {
+					del(o, null, val);
+				} else {
+					delete o[val];
+				}
+			}
+		} else if (typeof(item) === "object") {
+			for (var k in item) {
+				if (Array.isArray(o[k])) {
+					delete o[k];
+				} else if (typeof(o[k]) === "object") {
+					var type = typeof(item[k]);
+					if (type === "object") {
+						del(o[k], null, item[k]);
+					} else if (type === "string" || type === "number") {
+						delete o[k][item[k]];
+					} else {
+						delete o[k];
+					}
+				} else {
+					delete o[k];
+				}
+			}
+		} else {
+			delete o[item];
+		}
+		for (var k in o) {
+			if (Object.keys(o[k]).length === 0) {
+				delete o[k]
+			}
+		}
+		return o;
+	};
+	$.del = del;
+
+	/**
+	 * @description 修改对象属性
+	 * @param {Object} obj 对象
+	 * @param {Object} query 查询条件
+	 * @param {Object} value 返回修改的局部对象
+	 */
+	function set(obj, query, value) {
+		if (query) {
+			var oj = get(obj, query);
+			if (oj) {
+				$.push(oj, value);
+			}
+			return oj;
+		} else {
+			$.push(obj, value);
+			return obj;
+		}
+	};
+	$.set = set;
+
+	function arrToObj(arr) {
+		var obj = {};
+		var ret = obj;
+		var len = arr.length;
+		for (var i = 0; i < len; i++) {
+			var k = arr[i];
+			if (typeof(k) == "object") {
+				if (Array.isArray(k)) {
+					$.push(obj, arrToObj(k), true);
+				} else {
+					$.push(obj, k, true);
+				}
+			} else if (!obj[k]) {
+				if (len - i > 1) {
+					obj[k] = {};
+				} else {
+					obj[k] = true;
+				}
+				obj = obj[k];
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * @description 查询对象属性
+	 * @param {Object} obj 对象
+	 * @param {Object} query
+	 * @return {Object} 返回查询结果
+	 */
+	function get(obj, query) {
+		var ret;
+		if (typeof(obj) === 'object' && !Array.isArray(obj)) {
+			// 只有非数组的对象才进行操作
+			if (Array.isArray(query)) {
+				var ret = obj;
+				// 如果是数字则循环数组
+				for (var i = 0; i < query.length; i++) {
+					var o = query[i];
+					if (Array.isArray(o)) {
+						ret = get(ret, o);
+					} else if (typeof(o) === 'object') {
+						var oj = {};
+						for (var k in o) {
+							if (o[k]) {
+								oj[k] = get(ret[k], o[k]);
+							} else {
+								oj[k] = ret[k];
+							}
+						}
+						ret = oj;
+					} else {
+						ret = ret[o];
+						if (typeof(ret) !== 'object') {
+							break;
+						}
+					}
+				}
+
+			} else if (typeof(query) === 'object') {
+				var ret = {};
+				// 如果是对象则遍历对象
+				for (var k in query) {
+					ret[k] = get(obj[k], query[k]);
+				}
+				ret = ret;
+			} else if (query) {
+				if (typeof(query) == "string" || typeof(query) == "number") {
+					ret = {};
+					ret[query] = obj[query];
+				} else {
+					ret = obj;
+				}
+			} else {
+				// 如果query为空则返回整个对象
+				ret = null;
+			}
+		} else {
+			// 否则直接返回值
+			ret = obj;
+		}
+		return ret;
+	};
+	$.get = get;
 })();
