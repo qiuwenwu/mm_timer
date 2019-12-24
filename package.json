@@ -1,6 +1,6 @@
 {
   "name": "mm_timer",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "这是超级美眉timer定时执行类模块，用于定时执行任务",
   "main": "index.js",
   "scripts": {
