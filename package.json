@@ -1,6 +1,6 @@
 {
   "name": "mm_timer",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "这是超级美眉timer定时执行类模块，用于定时执行任务",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/qiuwenwu/mm_timer#readme",
   "dependencies": {
-    "mm_expand": "^1.3.7"
+    "mm_expand": "^1.3.9"
   },
   "devDependencies": {}
 }
