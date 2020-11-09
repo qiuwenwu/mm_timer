@@ -2,10 +2,11 @@ const Timer = require('./index.js');
 
 async function test() {
 	var timer = new Timer();
+	timer.config.interval = 60000;
 	timer.config.num = 100;
 	// timer.config.date_start = "2019-08-08 09:32";
 	// timer.config.date_end = "2019-08-08 09:33";
-	// timer.config.time = "09:36";
+	timer.config.time = "19:02";
 	await timer.run(function() {
 		console.log(timer.num);
 	});

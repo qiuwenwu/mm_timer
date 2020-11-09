@@ -60,7 +60,6 @@ class Timer {
 		this.interval;
 		/// 已执行次数
 		this.num = 0;
-
 	}
 }
 
@@ -95,15 +94,25 @@ Timer.prototype.setPeriod = function(func) {
 	var _this = this;
 	var cg = this.config;
 	var fn;
-	var time = time;
+	var time = cg.time;
 	if (time) {
 		if (time.indexOf(' ') !== -1) {
 			if (time.indexOf('-') !== -1) {
-				fn = function() {
-					if (new Date().toStr('MM-dd hh:mm:ss') === time) {
-						func();
-					}
-				};
+				var arr = time.split('-');
+				if(arr.length > 2){
+					fn = function() {
+						if (new Date().toStr('yyyy-MM-dd hh:mm:ss') === time) {
+							func();
+						}
+					};
+				}
+				else {
+					fn = function() {
+						if (new Date().toStr('MM-dd hh:mm:ss') === time) {
+							func();
+						}
+					};
+				}
 			} else {
 				fn = function() {
 					if (new Date().toStr('dd hh:mm:ss') === time) {
