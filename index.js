@@ -212,6 +212,8 @@ Timer.prototype.end = function() {
 	if (this.timeout) {
 		clearTimeout(this.timeout);
 	}
+	// 当前状态为结束
+	this.state = "end";
 };
 
 /**
@@ -249,7 +251,26 @@ Timer.prototype.run = async function(func) {
 	} else {
 		await this.setInterval(this.setPeriod(this.setNum(this.main)));
 	}
+	this.init();
 	return this;
+};
+
+/**
+ * @description 初始化定时器
+ */
+Timer.prototype.init = function() {
+	// 当前状态为开启
+	this.state = "start";
+	this.notify(_this.config.name, 'time init');
+};
+
+/**
+ * @description 启动定时器
+ */
+Timer.prototype.start = function() {
+	// 当前状态为开启
+	this.state = "start";
+	this.notify(_this.config.name, 'time start');
 };
 
 /**
