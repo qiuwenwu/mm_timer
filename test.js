@@ -6,7 +6,7 @@ async function test() {
 	timer.config.num = 100;
 	// timer.config.date_start = "2019-08-08 09:32";
 	// timer.config.date_end = "2019-08-08 09:33";
-	timer.config.time = "19:02";
+	timer.config.time = "08:19";
 	await timer.run(function() {
 		console.log(timer.num);
 	});

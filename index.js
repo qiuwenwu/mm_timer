@@ -99,14 +99,13 @@ Timer.prototype.setPeriod = function(func) {
 		if (time.indexOf(' ') !== -1) {
 			if (time.indexOf('-') !== -1) {
 				var arr = time.split('-');
-				if(arr.length > 2){
+				if (arr.length > 2) {
 					fn = function() {
 						if (new Date().toStr('yyyy-MM-dd hh:mm:ss') === time) {
 							func();
 						}
 					};
-				}
-				else {
+				} else {
 					fn = function() {
 						if (new Date().toStr('MM-dd hh:mm:ss') === time) {
 							func();
@@ -120,8 +119,7 @@ Timer.prototype.setPeriod = function(func) {
 					}
 				};
 			}
-		}
-		else {
+		} else {
 			var arr = time.split(':');
 			if (arr.length == 3) {
 				fn = function() {
@@ -236,8 +234,21 @@ Timer.prototype.clear = function(millisecond) {
  * @param {Function} func 回调函数
  * @return {Object} 当前类
  */
+Timer.prototype.main = async function() {
+	console.log('定时任务, 执行中...');
+};
+
+/**
+ * @description 执行线程
+ * @param {Function} func 回调函数
+ * @return {Object} 当前类
+ */
 Timer.prototype.run = async function(func) {
-	await this.setInterval(this.setPeriod(this.setNum(func)));
+	if (func) {
+		await this.setInterval(this.setPeriod(this.setNum(func)));
+	} else {
+		await this.setInterval(this.setPeriod(this.setNum(this.main)));
+	}
 	return this;
 };
 
