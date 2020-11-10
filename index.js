@@ -272,6 +272,8 @@ Timer.prototype.run = async function(func) {
  * @description 初始化定时器
  */
 Timer.prototype.init = function() {
+	// 当前执行次数
+	this.num = 1;
 	// 当前状态为开启
 	this.state = "start";
 	this.notify(this.config.name, 'init');
