@@ -58,8 +58,8 @@ class Timer {
 		this.timeout;
 		/// 定时执行器
 		this.interval;
-		/// 已执行次数
-		this.num = 0;
+		/// 当前执行次数
+		this.num = 1;
 	}
 }
 
@@ -155,8 +155,8 @@ Timer.prototype.setPeriod = function(func) {
 						fn();
 					}
 				} else {
-					_this.clear();
-					_this.notify(_this.config.name, 'time end');
+					_this.clear_sub();
+					_this.notify(_this.config.name, 'time_end');
 				}
 			};
 		} else {
@@ -174,8 +174,8 @@ Timer.prototype.setPeriod = function(func) {
 			if (span(now, end) >= 0) {
 				fn();
 			} else {
-				_this.clear();
-				_this.notify(_this.config.name, 'time end');
+				_this.clear_sub();
+				_this.notify(_this.config.name, 'time_end');
 			}
 		};
 	} else {
@@ -190,14 +190,17 @@ Timer.prototype.setPeriod = function(func) {
 Timer.prototype.setNum = function(func) {
 	var _this = this;
 	return function() {
-		if (_this.config.num < 1) {
-			func();
-		} else if (_this.num < _this.config.num) {
-			_this.num += 1;
-			func();
-		} else {
-			_this.clear();
-			_this.notify(_this.config.name, 'complete');
+		if (_this.state === 'start') {
+			if (_this.config.num < 1) {
+				func();
+			} else if (_this.num < _this.config.num) {
+				func();
+				_this.num += 1;
+			} else {
+				func();
+				_this.clear();
+				_this.notify(_this.config.name, 'completed');
+			}
 		}
 	};
 };
@@ -206,14 +209,22 @@ Timer.prototype.setNum = function(func) {
  * @description 结束定时器
  */
 Timer.prototype.end = function() {
+	// 当前状态为结束
+	this.state = "end";
+	this.notify(this.config.name, 'suspend');
+	this.clear();
+};
+
+/**
+ * @description 清除定时器(子函数)
+ */
+Timer.prototype.clear_sub = function() {
 	if (this.interval) {
 		clearInterval(this.interval);
 	}
 	if (this.timeout) {
 		clearTimeout(this.timeout);
 	}
-	// 当前状态为结束
-	this.state = "end";
 };
 
 /**
@@ -224,10 +235,10 @@ Timer.prototype.clear = function(millisecond) {
 	if (millisecond) {
 		var _this = this;
 		setTimeout(function() {
-			_this.end();
+			_this.clear_sub();
 		}, millisecond);
 	} else {
-		this.end();
+		this.clear_sub();
 	}
 };
 
@@ -246,12 +257,12 @@ Timer.prototype.main = async function() {
  * @return {Object} 当前类
  */
 Timer.prototype.run = async function(func) {
+	this.init();
 	if (func) {
 		await this.setInterval(this.setPeriod(this.setNum(func)));
 	} else {
 		await this.setInterval(this.setPeriod(this.setNum(this.main)));
 	}
-	this.init();
 	return this;
 };
 
@@ -261,7 +272,7 @@ Timer.prototype.run = async function(func) {
 Timer.prototype.init = function() {
 	// 当前状态为开启
 	this.state = "start";
-	this.notify(_this.config.name, 'time init');
+	this.notify(this.config.name, 'init');
 };
 
 /**
@@ -270,23 +281,56 @@ Timer.prototype.init = function() {
 Timer.prototype.start = function() {
 	// 当前状态为开启
 	this.state = "start";
-	this.notify(_this.config.name, 'time start');
+	this.notify(this.config.name, 'start');
+};
+
+/**
+ * @description 暂停定时器
+ */
+Timer.prototype.stop = function() {
+	// 当前状态为开启
+	this.state = "stop";
+	this.notify(this.config.name, 'stop');
 };
 
 /**
  * @description 通知函数, 当定时器执行完最后一次时, 会调用通知函数
  * @param {String} name 名称
- * @param {String} why 结束的原因
+ * @param {String} state 状态
  */
-Timer.prototype.notify = function(name, why) {
-	console.log('定时器:' + name + "已结束运行。\n原因时:" + why);
+Timer.prototype.notify = function(name, state) {
+	switch (state) {
+		case "init":
+			console.log('初始化');
+			break;
+		case "start":
+			console.log('开始执行');
+			break;
+		case "stop":
+			console.log('已暂停');
+			break;
+		case "suspend":
+			// 主动中断
+			console.log('已中断');
+			break;
+		case "time_end":
+			console.log('已到期');
+			// 删除任务
+			break;
+		case "completed":
+			console.log('已完成');
+			// 删除任务
+			break;
+		default:
+			break;
+	}
 };
 
 /**
  * @description 销毁资源
  */
 Timer.prototype.dispose = function() {
-	this.clear();
+	this.clear_sub();
 	this.interval = undefined;
 	this.timeout = undefined;
 };
