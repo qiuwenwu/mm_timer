@@ -54,6 +54,8 @@ class Timer {
 		if (config) {
 			$.push(this.config, config);
 		}
+		/// 状态
+		this.state = "start";
 		/// 等候器
 		this.timeout;
 		/// 定时执行器
